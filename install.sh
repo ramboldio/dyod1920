@@ -36,7 +36,7 @@ if echo $REPLY | grep -E '^[Yy]$' > /dev/null; then
                 fi
             done
 
-            if ! brew install llvm --with-toolchain; then
+            if ! brew install llvm; then
                 echo "Error during llvm/clang installation."
                 exit 1
             fi
