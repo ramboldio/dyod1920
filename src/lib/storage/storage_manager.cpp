@@ -9,27 +9,35 @@
 
 namespace opossum {
 
-StorageManager& StorageManager::get() {
-  return *(new StorageManager());
-  // A really hacky fix to get the tests to run - replace this with your implementation
+ StorageManager& StorageManager::get() {
+    static StorageManager instance;
+    return instance;
 }
 
 void StorageManager::add_table(const std::string& name, std::shared_ptr<Table> table) {
-  // Implementation goes here
+  tables[name] = table; //what happens if the table already exists?
 }
 
 void StorageManager::drop_table(const std::string& name) {
-  // Implementation goes here
+    auto it=tables.find(name);
+    tables.erase (it);
 }
 
 std::shared_ptr<Table> StorageManager::get_table(const std::string& name) const {
-  // Implementation goes here
-  return nullptr;
+    auto it = tables.find(name);
+    if (it != tables.end()) {
+        return it->second;
+    }
+
+    throw std::runtime_error(std::string("Cannot find following table: " + name));
 }
 
 bool StorageManager::has_table(const std::string& name) const {
-  // Implementation goes here
-  return false;
+    auto it = tables.find(name);
+    if (it != tables.end()) {
+        return true;
+    }
+    return false;
 }
 
 std::vector<std::string> StorageManager::table_names() const {
@@ -41,7 +49,7 @@ void StorageManager::print(std::ostream& out) const {
 }
 
 void StorageManager::reset() {
-  // Implementation goes here;
+    // Implementation goes here
 }
 
 }  // namespace opossum
