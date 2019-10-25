@@ -15,12 +15,17 @@ namespace opossum {
 }
 
 void StorageManager::add_table(const std::string& name, std::shared_ptr<Table> table) {
-  tables[name] = table; //what happens if the table already exists?
+  if (!this->has_table(name)) {
+      tables[name] = table; 
+  } else {
+      throw std::runtime_error(std::string("Table already exists: " + name));
+  }
+
 }
 
 void StorageManager::drop_table(const std::string& name) {
-    auto it=tables.find(name);
-    tables.erase (it);
+    this->get_table(name);
+    tables.erase(name);
 }
 
 std::shared_ptr<Table> StorageManager::get_table(const std::string& name) const {
@@ -45,11 +50,13 @@ std::vector<std::string> StorageManager::table_names() const {
 }
 
 void StorageManager::print(std::ostream& out) const {
-  // Implementation goes here
+    for (auto table : tables) {
+        out << table.first << std::endl;
+    }
 }
 
 void StorageManager::reset() {
-    // Implementation goes here
+    tables.clear();
 }
 
 }  // namespace opossum

@@ -45,7 +45,7 @@ namespace opossum {
     }
 
     void Table::append(std::vector<AllTypeVariant> values) {
-    //if last chunk is full create a new chunk and add it to back
+    // if last chunk is full create a new chunk and add it to back
     if (chunks.back().size() >= chunk_size) {
         this->build_chunk();
     }
@@ -61,7 +61,7 @@ namespace opossum {
     }
 
     ChunkID Table::chunk_count() const {
-      return ChunkID{chunks.size()};
+      return ChunkID{(uint32_t) chunks.size()};
     }
 
     ColumnID Table::column_id_by_name(const std::string& column_name) const {

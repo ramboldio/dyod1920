@@ -27,6 +27,20 @@ namespace opossum {
    EXPECT_THROW(sm.get_table("third_table"), std::exception);
  }
 
+
+ TEST_F(StorageStorageManagerTest, PrintTableNames) {
+   auto& sm = StorageManager::get();
+   std::stringstream ss;
+   sm.print(ss);
+   EXPECT_EQ(ss.str(), "first_table\nsecond_table\n");
+ }
+
+ TEST_F(StorageStorageManagerTest, AddAlreadExisitingTable) {
+   auto& sm = StorageManager::get();
+   auto t1 = std::make_shared<Table>();
+   EXPECT_THROW(sm.add_table("first_table", t1), std::exception);
+ }
+
  TEST_F(StorageStorageManagerTest, DropTable) {
    auto& sm = StorageManager::get();
    sm.drop_table("first_table");
@@ -48,6 +62,7 @@ namespace opossum {
  TEST_F(StorageStorageManagerTest, HasTable) {
    auto& sm = StorageManager::get();
    EXPECT_EQ(sm.has_table("first_table"), true);
+   EXPECT_EQ(sm.has_table("fiasdasdundfable"), false);
  }
 
 }  // namespace opossum
