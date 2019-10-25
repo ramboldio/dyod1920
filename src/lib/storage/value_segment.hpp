@@ -28,7 +28,7 @@ class ValueSegment : public BaseSegment {
   const std::vector<T>& values() const;
 
  protected:
-    std::vector<T> value_segment;
+  std::vector<T> value_segment;
 };
 
 }  // namespace opossum
