@@ -26,7 +26,7 @@ void ValueSegment<T>::append(const AllTypeVariant& val) {
 
 template <typename T>
 size_t ValueSegment<T>::size() const {
-  // TODO: Why do we need here size_t and not just uint32_t since it should have
+  // Why do we need size_t here and not just uint32_t since it should have
   // the same range as chunk size which is uint32
   return value_segment.size();
 }
