@@ -61,7 +61,7 @@ uint16_t Table::column_count() const {
 
 uint64_t Table::row_count() const { return chunk_size * (chunk_count() - 1) + chunks.back().size(); }
 
-ChunkID Table::chunk_count() const { return ChunkID{(uint32_t)chunks.size()}; }
+ChunkID Table::chunk_count() const { return ChunkID{static_cast<uint32_t>(chunks.size())}; }
 
 ColumnID Table::column_id_by_name(const std::string& column_name) const {
   ColumnID index = ColumnID(distance(col_names.begin(), find(col_names.begin(), col_names.end(), column_name)));
