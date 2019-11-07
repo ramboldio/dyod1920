@@ -85,6 +85,17 @@ Chunk& Table::get_chunk(ChunkID chunk_id) { return chunks[chunk_id]; }
 
 const Chunk& Table::get_chunk(ChunkID chunk_id) const { return chunks[chunk_id]; }
 
-void Table::compress_chunk(ChunkID chunk_id) { throw std::runtime_error("Implement Table::compress_chunk"); }
+void Table::compress_chunk(ChunkID chunk_id) {
+    // TODO implement
+    Chunk compressed_chunk = Chunk();
+    for(uint16_t idx=0; idx < this->get_chunk(chunk_id).column_count(); idx++){
+        std::shared_ptr<BaseSegment> seg = this->get_chunk(chunk_id).get_segment(type_cast<ColumnID>(idx));
+        DictionarySegment dict = DictionarySegment(seg);
+        compressed_chunk.append(dict);
+    }
+    this->chunks[chunk_id] = std::move(compressed_chunk);
+    // TODO: ensure that old chunk is deleted/ not accessible any more
+}
+
 
 }  // namespace opossum
