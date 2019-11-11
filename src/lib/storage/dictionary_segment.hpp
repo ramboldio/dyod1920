@@ -8,6 +8,7 @@
 #include <type_cast.hpp>
 
 #include "base_attribute_vector.hpp"
+#include "fixed_size_attribute_vector.hpp"
 #include "all_type_variant.hpp"
 #include "types.hpp"
 
@@ -29,7 +30,8 @@ class DictionarySegment : public BaseSegment {
    * Creates a Dictionary segment from a given value segment.
    */
   explicit DictionarySegment(const std::shared_ptr<BaseSegment>& base_segment){
-      // this._attribute_vector = BaseAttributeVector();
+      _attribute_vector = std::make_shared<FixedSizeAttributeVector<uint16_t>>(FixedSizeAttributeVector<uint16_t>());
+      _dictionary = std::make_shared<std::vector<T>>(std::vector<T>());
   }
 
   // SEMINAR INFORMATION: Since most of these methods depend on the template parameter, you will have to implement
@@ -107,7 +109,7 @@ class DictionarySegment : public BaseSegment {
 
   // return the number of unique_values (dictionary entries)
   size_t unique_values_count() const{
-      return _dictionary->size();
+      return static_cast<size_t >(_dictionary->size());
   }
 
   // return the number of entries
