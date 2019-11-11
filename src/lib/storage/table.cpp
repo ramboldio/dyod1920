@@ -89,9 +89,10 @@ const Chunk& Table::get_chunk(ChunkID chunk_id) const { return chunks[chunk_id];
 void Table::compress_chunk(ChunkID chunk_id) {
     Chunk compressed_chunk = Chunk();
     for(uint16_t idx=0; idx < this->get_chunk(chunk_id).column_count(); idx++){
-        std::shared_ptr<BaseSegment> seg = this->get_chunk(chunk_id).get_segment(type_cast<ColumnID>(idx));
-        DictionarySegment dict = DictionarySegment(seg);
-        compressed_chunk.append(dict);
+        const std::shared_ptr<BaseSegment> seg = this->get_chunk(chunk_id).get_segment(type_cast<ColumnID>(idx));
+        const DictionarySegment new_dict_seg = DictionarySegment<AllTypeVariant>(seg);
+        const std::shared_ptr<BaseSegment> dict = std::make_shared<BaseSegment>(new_dict_seg);
+        compressed_chunk.add_segment(dict);
     }
     this->chunks[chunk_id] = std::move(compressed_chunk);
     // TODO: ensure that old chunk is deleted/ not accessible any more
