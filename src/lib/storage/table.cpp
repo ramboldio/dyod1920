@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "value_segment.hpp"
+#include "dictionary_segment.hpp"
 
 #include "resolve_type.hpp"
 #include "types.hpp"
@@ -86,7 +87,6 @@ Chunk& Table::get_chunk(ChunkID chunk_id) { return chunks[chunk_id]; }
 const Chunk& Table::get_chunk(ChunkID chunk_id) const { return chunks[chunk_id]; }
 
 void Table::compress_chunk(ChunkID chunk_id) {
-    // TODO implement
     Chunk compressed_chunk = Chunk();
     for(uint16_t idx=0; idx < this->get_chunk(chunk_id).column_count(); idx++){
         std::shared_ptr<BaseSegment> seg = this->get_chunk(chunk_id).get_segment(type_cast<ColumnID>(idx));
