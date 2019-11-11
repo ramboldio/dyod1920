@@ -73,17 +73,18 @@ class DictionarySegment : public BaseSegment {
     // TODO: test if this really includes the case where the value is equal to the search value
     // TODO: test if this works for strings (if not, implement!)
 
-    auto lower_bound_ref = std::lower_bound(_dictionary->begin(), _dictionary->end(), value);
-    if(lower_bound_ref == _dictionary->end()){
+    auto lower_bound_ref = std::lower_bound(_dictionary->cbegin(), _dictionary->cend(), value);
+    if(lower_bound_ref == _dictionary->cend()){
         return INVALID_VALUE_ID;
     }
-    return (lower_bound_ref - _dictionary->begin());
+    auto x  = lower_bound_ref - _dictionary->cbegin();
+    return static_cast<ValueID>(x);
   }
 
 //  // same as lower_bound(T), but accepts an AllTypeVariant
-//  ValueID lower_bound(const AllTypeVariant& value) const{
-//      return lower_bound(type_cast<T>(value));
-//  }
+  ValueID lower_bound(const AllTypeVariant& value) const{
+      return lower_bound(type_cast<T>(value));
+  }
 
   // returns the first value ID that refers to a value < the search value
   // returns INVALID_VALUE_ID if all values are smaller than or equal to the search value
@@ -91,17 +92,18 @@ class DictionarySegment : public BaseSegment {
       // TODO: test if this really excludes the case where the value is equal to the search value
       // TODO: test if this works for strings (if not, implement!)
 
-      auto lower_bound_ref = std::upper_bound(_dictionary->begin(), _dictionary->end(), value);
-      if(lower_bound_ref == _dictionary->end()){
+      auto upper_bound_ref = std::upper_bound(_dictionary->cbegin(), _dictionary->cend(), value);
+      if(upper_bound_ref == _dictionary->cend()){
           return INVALID_VALUE_ID;
       }
-      return (lower_bound_ref - _dictionary->begin());
+      auto x = upper_bound_ref - _dictionary->cbegin();
+      return static_cast<ValueID>(x);
   }
 
   // same as upper_bound(T), but accepts an AllTypeVariant
-//  ValueID upper_bound(const AllTypeVariant& value) const{
-//      return upper_bound(type_cast<T>(value));
-//  }
+  ValueID upper_bound(const AllTypeVariant& value) const{
+      return upper_bound(type_cast<T>(value));
+  }
 
   // return the number of unique_values (dictionary entries)
   size_t unique_values_count() const{
