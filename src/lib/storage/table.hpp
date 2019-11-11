@@ -81,7 +81,7 @@ class Table : private Noncopyable {
 
  protected:
   uint32_t chunk_size;
-  std::vector<Chunk> chunks;
+  std::vector<Chunk> _chunks;
   std::vector<std::string> col_names;
   std::vector<std::string> col_types;
 
