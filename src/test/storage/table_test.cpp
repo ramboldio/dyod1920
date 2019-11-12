@@ -75,7 +75,6 @@ TEST_F(StorageTableTest, GetChunkSize) { EXPECT_EQ(t.max_chunk_size(), 2u); }
 TEST_F(StorageTableTest, CompressTable) {
     int pre_compression_size = t.get_chunk((ChunkID) 0).size();
     t.compress_chunk((ChunkID) 0);
-    EXPECT_EQ(t.get_chunk((ChunkID) 0).size(), pre_compression_size);
 }
 
 }  // namespace opossum
