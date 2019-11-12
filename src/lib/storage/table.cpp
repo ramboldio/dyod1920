@@ -14,6 +14,7 @@
 #include "resolve_type.hpp"
 #include "types.hpp"
 #include "utils/assert.hpp"
+#include "dictionary_segment.hpp"
 
 namespace opossum {
 
@@ -85,6 +86,23 @@ Chunk& Table::get_chunk(ChunkID chunk_id) { return chunks[chunk_id]; }
 
 const Chunk& Table::get_chunk(ChunkID chunk_id) const { return chunks[chunk_id]; }
 
-void Table::compress_chunk(ChunkID chunk_id) { throw std::runtime_error("Implement Table::compress_chunk"); }
+void Table::compress_chunk(ChunkID chunk_id) {
+
+    Chunk dict_chunk = Chunk();
+    Chunk& old_chunk = get_chunk(chunk_id);
+
+    for(ColumnID i = static_cast<ColumnID>(0); i <= old_chunk.column_count(); ++i){
+        const auto old_segment = old_chunk.get_segment(i);
+
+        // Create dict segment and add it to the new dict_chunk
+        auto dictionary_segment = DictionarySegment<AllTypeVariant>(old_segment);
+        auto pSegment = make_shared_by_data_type<BaseSegment, DictionarySegment>(column_type(i), old_segment);
+        dict_chunk.add_segment(pSegment);
+    }
+
+    //Replace Chunk
+    chunks[chunk_id] = std::move(dict_chunk);
+
+}
 
 }  // namespace opossum

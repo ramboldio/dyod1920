@@ -25,7 +25,38 @@ class DictionarySegment : public BaseSegment {
   /**
    * Creates a Dictionary segment from a given value segment.
    */
-  explicit DictionarySegment(const std::shared_ptr<BaseSegment>& base_segment);
+  explicit DictionarySegment(const std::shared_ptr<BaseSegment>& base_segment) {
+      std::set<T> set_dict = std::set<T>();
+
+      const auto value_segment = std::dynamic_pointer_cast<ValueSegment<T>>(base_segment);
+
+      //Insert values in set to delete duplicates
+      for (auto value : value_segment->values())
+          set_dict.emplace(value);
+
+      //Sort values in set to get //TODO is set already sorted?
+      std::sort (set_dict.begin(), set_dict.end());
+
+      // Convert set to vector to create the dictionary
+      const auto dict = std::vector<T>(set_dict.begin(), set_dict.end());
+
+      // Create pointer for new dict
+      _dictionary = std::make_shared<std::vector<T>>(dict);
+
+      auto attribute_values = std::vector<T>();
+      attribute_values.reserve(value_segment->size());
+
+      for (auto value : value_segment->values()){
+          //Get index of value from dict
+          const auto it = std::find(attribute_values.begin(), attribute_values.end(), value);
+
+          const auto index = std::distance(attribute_values.begin(), it);
+          attribute_values.push_back(static_cast<T>(index));
+      }
+
+      // Create pointer for attribute vector
+      _attribute_vector = std::make_shared<BaseAttributeVector>(attribute_values);
+  }
 
   // SEMINAR INFORMATION: Since most of these methods depend on the template parameter, you will have to implement
   // the DictionarySegment in this file. Replace the method signatures with actual implementations.
@@ -74,6 +105,8 @@ class DictionarySegment : public BaseSegment {
  protected:
   std::shared_ptr<std::vector<T>> _dictionary;
   std::shared_ptr<BaseAttributeVector> _attribute_vector;
+
+
 };
 
 }  // namespace opossum
