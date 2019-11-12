@@ -31,11 +31,11 @@ class DictionarySegment : public BaseSegment {
       const auto value_segment = std::dynamic_pointer_cast<ValueSegment<T>>(base_segment);
 
       //Insert values in set to delete duplicates
-      for (auto value : value_segment->values())
-          set_dict.emplace(value);
+//      for (auto value : value_segment->values())
+//          set_dict.emplace(value);
 
       //Sort values in set to get //TODO is set already sorted?
-      std::sort (set_dict.begin(), set_dict.end());
+//      std::sort (set_dict.begin(), set_dict.end());
 
       // Convert set to vector to create the dictionary
       const auto dict = std::vector<T>(set_dict.begin(), set_dict.end());
@@ -50,12 +50,12 @@ class DictionarySegment : public BaseSegment {
           //Get index of value from dict
           const auto it = std::find(attribute_values.begin(), attribute_values.end(), value);
 
-          const auto index = std::distance(attribute_values.begin(), it);
-          attribute_values.push_back(static_cast<T>(index));
+          const T index = static_cast<T>(std::distance(attribute_values.begin(), it));
+//          attribute_values.push_back(index);
       }
 
       // Create pointer for attribute vector
-      _attribute_vector = std::make_shared<BaseAttributeVector>(attribute_values);
+//      _attribute_vector = std::make_shared<>(attribute_values);
   }
 
   // SEMINAR INFORMATION: Since most of these methods depend on the template parameter, you will have to implement
