@@ -14,10 +14,12 @@
 
 namespace opossum {
 
-void Chunk::add_segment(std::shared_ptr<BaseSegment> segment) { column_segments.push_back(segment); }
+    void Chunk::add_segment(std::shared_ptr<BaseSegment> segment) {
+    column_segments.push_back(segment);
+}
 
 void Chunk::append(const std::vector<AllTypeVariant>& values) {
-  DebugAssert(values.size() == this->column_count(),
+  DebugAssert(values.size() == column_count(),
               "Number of given values do not match up with number of segments within the chunk");
 
   for (uint16_t index = 0; index < values.size(); ++index) {
