@@ -54,4 +54,55 @@
    EXPECT_EQ(dict_col->upper_bound(15), opossum::INVALID_VALUE_ID);
  }
 
+    TEST_F(StorageDictionarySegmentTest, MemoryConsumption){
+    // Setup
+    for (int i = 0; i <= 10; i += 2) vc_int->append(i);
+    auto col = opossum::make_shared_by_data_type<opossum::BaseSegment, opossum::DictionarySegment>("int", vc_int);
+    auto dict_col = std::dynamic_pointer_cast<opossum::DictionarySegment<int>>(col);
+
+    int expected_size_dict =  vc_int->size() * sizeof(int) + dict_col->size() * sizeof(uint8_t);
+    EXPECT_EQ(dict_col->estimate_memory_usage(), expected_size_dict);
+    }
+
+    TEST_F(StorageDictionarySegmentTest, GetValues){
+    // Setup
+    for (int i = 0; i <= 10; i += 2) vc_int->append(i);
+    auto col = opossum::make_shared_by_data_type<opossum::BaseSegment, opossum::DictionarySegment>("int", vc_int);
+    auto dict_col = std::dynamic_pointer_cast<opossum::DictionarySegment<int>>(col);
+
+    EXPECT_EQ(dict_col->get(1), 2);
+    }
+
+    TEST_F(StorageDictionarySegmentTest, ReturnValuesByID){
+    // Setup
+    for (int i = 0; i <= 10; i += 2) vc_int->append(i);
+    auto col = opossum::make_shared_by_data_type<opossum::BaseSegment, opossum::DictionarySegment>("int", vc_int);
+    auto dict_col = std::dynamic_pointer_cast<opossum::DictionarySegment<int>>(col);
+
+    EXPECT_EQ(dict_col->value_by_value_id((opossum::ValueID)3), 6);
+    }
+
+    TEST_F(StorageDictionarySegmentTest, SortedValues){
+    // Setup
+    vc_int->append(87);
+    vc_int->append(90);
+    vc_int->append(3);
+    auto col = opossum::make_shared_by_data_type<opossum::BaseSegment, opossum::DictionarySegment>("int", vc_int);
+    auto dict_col = std::dynamic_pointer_cast<opossum::DictionarySegment<int>>(col);
+    //std::cout<<(dict_col->get((opossum::ValueID)0))<<std::endl;
+
+    EXPECT_EQ(dict_col->value_by_value_id((opossum::ValueID)0), 3);
+    }
+
+    TEST_F(StorageDictionarySegmentTest, CountUniqueValues){
+    // Setup
+    for (int i = 0; i <= 10; i += 2) vc_int->append(i);
+    // to test if no double values are added to the dict
+    vc_int->append(0);
+    auto col = opossum::make_shared_by_data_type<opossum::BaseSegment, opossum::DictionarySegment>("int", vc_int);
+    auto dict_col = std::dynamic_pointer_cast<opossum::DictionarySegment<int>>(col);
+
+    EXPECT_EQ(dict_col->unique_values_count(), 6);
+    }
+
 // TODO(student): You should add some more tests here (full coverage would be appreciated) and possibly in other files.

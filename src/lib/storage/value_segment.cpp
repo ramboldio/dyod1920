@@ -35,9 +35,7 @@ size_t ValueSegment<T>::size() const {
 
 template <typename T>
 size_t ValueSegment<T>::estimate_memory_usage() const {
-  // Implementation goes here
-  // TODO implement
-  return 0;
+  return sizeof(T) * _value_segment.size();
 }
 
     template<typename T>
