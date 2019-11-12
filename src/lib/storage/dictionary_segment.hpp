@@ -78,14 +78,12 @@ class DictionarySegment : public BaseSegment {
 
   // return the value at a certain position.
   T get(const size_t chunk_offset) const{
-      // TODO: check if this is really doing the same thing as the function above
       return _dictionary->at(_attribute_vector->get(chunk_offset));
   }
 
   // dictionary segments are immutable
   void append(const AllTypeVariant&) override{
-      // TODO make beautiful message
-      throw std::runtime_error(std::string("dictionary segments are immutable"));
+      throw std::runtime_error(std::string("Dictionary segments are immutable"));
   }
 
   // returns an underlying dictionary
