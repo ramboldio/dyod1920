@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "value_segment.hpp"
+#include "dictionary_segment.hpp"
 
 #include "resolve_type.hpp"
 #include "types.hpp"
@@ -30,7 +31,7 @@ void Table::add_column(const std::string& name, const std::string& type) {
   col_types.push_back(type);
 
   auto segment = make_shared_by_data_type<BaseSegment, ValueSegment>(type);
-  chunks.back().add_segment(segment);
+  _chunks.back().add_segment(segment);
 }
 
 void Table::
@@ -38,31 +39,31 @@ void Table::
     // My IDE wrongly notifies me that I do not use this function
     build_chunk() {
   // Create Chunk
-  chunks.push_back(Chunk());
+  _chunks.push_back(Chunk());
 
   // Create segments for new chunk
   for (uint32_t index = 0; index < col_types.size(); ++index) {  // TODO(all): Wat is the MAX for col_types?
     auto segment = make_shared_by_data_type<BaseSegment, ValueSegment>(col_types[index]);
-    chunks.back().add_segment(segment);
+    _chunks.back().add_segment(segment);
   }
 }
 
 void Table::append(std::vector<AllTypeVariant> values) {
   // if last chunk is full create a new chunk and add it to back
-  if (chunks.back().size() >= chunk_size) {
+  if (_chunks.back().size() >= chunk_size) {
     this->build_chunk();
   }
-  chunks.back().append(values);
+  _chunks.back().append(values);
 }
 
 uint16_t Table::column_count() const {
-  return chunks.back()
+  return _chunks.back()
       .column_count();  // I assume here that all chunks have the same count of columns. Last chunk -> most recent data
 }
 
-uint64_t Table::row_count() const { return chunk_size * (chunk_count() - 1) + chunks.back().size(); }
+uint64_t Table::row_count() const { return chunk_size * (chunk_count() - 1) + _chunks.back().size(); }
 
-ChunkID Table::chunk_count() const { return ChunkID{static_cast<uint32_t>(chunks.size())}; }
+ChunkID Table::chunk_count() const { return ChunkID{static_cast<uint32_t>(_chunks.size())}; }
 
 ColumnID Table::column_id_by_name(const std::string& column_name) const {
   ColumnID index = ColumnID(distance(col_names.begin(), find(col_names.begin(), col_names.end(), column_name)));
@@ -82,9 +83,9 @@ const std::string& Table::column_name(ColumnID column_id) const { return col_nam
 
 const std::string& Table::column_type(ColumnID column_id) const { return col_types[column_id]; }
 
-Chunk& Table::get_chunk(ChunkID chunk_id) { return chunks[chunk_id]; }
+Chunk& Table::get_chunk(ChunkID chunk_id) { return _chunks[chunk_id]; }
 
-const Chunk& Table::get_chunk(ChunkID chunk_id) const { return chunks[chunk_id]; }
+const Chunk& Table::get_chunk(ChunkID chunk_id) const { return _chunks[chunk_id]; }
 
 void Table::compress_chunk(ChunkID chunk_id) {
 
@@ -95,13 +96,12 @@ void Table::compress_chunk(ChunkID chunk_id) {
         const auto old_segment = old_chunk.get_segment(i);
 
         // Create dict segment and add it to the new dict_chunk
-        auto dictionary_segment = DictionarySegment<AllTypeVariant>(old_segment);
         auto pSegment = make_shared_by_data_type<BaseSegment, DictionarySegment>(column_type(i), old_segment);
         dict_chunk.add_segment(pSegment);
     }
 
-    //Replace Chunk
-    chunks[chunk_id] = std::move(dict_chunk);
+    // Replace Chunk
+    _chunks[chunk_id] = std::move(dict_chunk);
 
 }
 

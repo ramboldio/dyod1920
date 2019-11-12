@@ -13,7 +13,12 @@ namespace opossum {
 template <typename T>
 class ValueSegment : public BaseSegment {
  public:
-  // return the value at a certain position. If you want to write efficient operators, back off!
+
+    ValueSegment() {
+        _value_segment = std::vector<T>();
+    }
+
+    // return the value at a certain position. If you want to write efficient operators, back off!
   AllTypeVariant operator[](const ChunkOffset chunk_offset) const final;
 
   // add a value to the end
@@ -31,7 +36,7 @@ class ValueSegment : public BaseSegment {
   size_t estimate_memory_usage() const final;
 
  protected:
-  std::vector<T> value_segment;
+  std::vector<T> _value_segment;
 };
 
 }  // namespace opossum
