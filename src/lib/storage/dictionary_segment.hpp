@@ -5,6 +5,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <set>
 #include <type_cast.hpp>
 
 #include "base_attribute_vector.hpp"
