@@ -62,8 +62,6 @@
 
     int expected_size_seg = sizeof(int) * vc_int->size();
     EXPECT_EQ(vc_int->estimate_memory_usage(), expected_size_seg);
-    std::cout<< dict_col->estimate_memory_usage() << ' ' << expected_size_seg <<std::endl;
-    //EXPECT_LT(dict_col->estimate_memory_usage(), expected_size_seg);
  }
 
 // TODO(student): You should add some more tests here (full coverage would be appreciated) and possibly in other files.

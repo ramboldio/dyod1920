@@ -48,6 +48,18 @@ class DictionarySegment : public BaseSegment {
       // Create pointer for new dict
       _dictionary = std::make_shared<std::vector<T>>(dict);
 
+      const auto entropy = ((int) std::log2(_dictionary->size())) + 1;
+      if(entropy <= 8){
+          _attribute_vector = std::make_shared<FixedSizeAttributeVector<uint8_t>>(FixedSizeAttributeVector<uint8_t>());
+      } else if(entropy <= 16){
+          _attribute_vector = std::make_shared<FixedSizeAttributeVector<uint16_t>>(FixedSizeAttributeVector<uint16_t>());
+      } else if(entropy <= 32) {
+          _attribute_vector = std::make_shared<FixedSizeAttributeVector<uint32_t>>(
+                  FixedSizeAttributeVector<uint32_t>());
+      } else{
+          throw std::runtime_error(std::string("Not enough memory"));
+      }
+
       for (size_t i = 0; i < values.size(); i++){
           //Get index of value from dict
           const auto it = std::find(_dictionary->begin(), _dictionary->end(), values[i]);
@@ -113,9 +125,6 @@ class DictionarySegment : public BaseSegment {
   // returns the first value ID that refers to a value < the search value
   // returns INVALID_VALUE_ID if all values are smaller than or equal to the search value
   ValueID upper_bound(T value) const{
-      // TODO: test if this really excludes the case where the value is equal to the search value
-      // TODO: test if this works for strings (if not, implement!)
-
       auto upper_bound_ref = std::upper_bound(_dictionary->cbegin(), _dictionary->cend(), value);
       if(upper_bound_ref == _dictionary->cend()){
           return INVALID_VALUE_ID;
