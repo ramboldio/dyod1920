@@ -104,5 +104,3 @@
 
     EXPECT_EQ(dict_col->unique_values_count(), 6);
     }
-
-// TODO(student): You should add some more tests here (full coverage would be appreciated) and possibly in other files.
