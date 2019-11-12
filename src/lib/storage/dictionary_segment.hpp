@@ -41,17 +41,11 @@ class DictionarySegment : public BaseSegment {
           set_dict.emplace(value);
       }
 
-      //Sort values in set to get //TODO is set already sorted?
-//      std::sort (_attribute_vector.begin(), set_dict.end());
-
       // Convert set to vector to create the dictionary
       const auto dict = std::vector<T>(set_dict.begin(), set_dict.end());
 
       // Create pointer for new dict
       _dictionary = std::make_shared<std::vector<T>>(dict);
-
-//      auto attribute_values = std::vector<T>();
-//      attribute_values.reserve(value_segment->size());
 
       for (size_t i = 0; i < values.size(); i++){
           //Get index of value from dict
@@ -59,7 +53,6 @@ class DictionarySegment : public BaseSegment {
           const ValueID index = static_cast<ValueID>(std::distance(_dictionary->begin(), it));
           _attribute_vector->set(i, index);
       }
-
   }
 
   // SEMINAR INFORMATION: Since most of these methods depend on the template parameter, you will have to implement
@@ -147,8 +140,8 @@ class DictionarySegment : public BaseSegment {
 
   // returns the calculated memory usage
   size_t estimate_memory_usage() const final{
-      // TODO implement
-    return (_attribute_vector->size()) * _attribute_vector->width();
+    const auto memory_usage =  (_attribute_vector->size()) * _attribute_vector->width() + _dictionary->size() * sizeof(T);
+    return memory_usage;
   }
 
  protected:
