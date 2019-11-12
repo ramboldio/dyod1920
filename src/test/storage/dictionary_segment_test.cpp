@@ -73,7 +73,15 @@
     EXPECT_EQ(dict_col->get(1), 2);
     }
 
-    // is wrong
+    TEST_F(StorageDictionarySegmentTest, ReturnValuesByID){
+    // Setup
+    for (int i = 0; i <= 10; i += 2) vc_int->append(i);
+    auto col = opossum::make_shared_by_data_type<opossum::BaseSegment, opossum::DictionarySegment>("int", vc_int);
+    auto dict_col = std::dynamic_pointer_cast<opossum::DictionarySegment<int>>(col);
+
+    EXPECT_EQ(dict_col->value_by_value_id((opossum::ValueID)3), 6);
+    }
+
     TEST_F(StorageDictionarySegmentTest, SortedValues){
     // Setup
     vc_int->append(87);
@@ -83,16 +91,7 @@
     auto dict_col = std::dynamic_pointer_cast<opossum::DictionarySegment<int>>(col);
     //std::cout<<(dict_col->get((opossum::ValueID)0))<<std::endl;
 
-    EXPECT_EQ(dict_col->get(0), 3);
-    }
-
-    TEST_F(StorageDictionarySegmentTest, ReturnValuesByID){
-    // Setup
-    for (int i = 0; i <= 10; i += 2) vc_int->append(i);
-    auto col = opossum::make_shared_by_data_type<opossum::BaseSegment, opossum::DictionarySegment>("int", vc_int);
-    auto dict_col = std::dynamic_pointer_cast<opossum::DictionarySegment<int>>(col);
-
-    EXPECT_EQ(dict_col->value_by_value_id((opossum::ValueID)3), 6);
+    EXPECT_EQ(dict_col->value_by_value_id((opossum::ValueID)0), 3);
     }
 
     TEST_F(StorageDictionarySegmentTest, CountUniqueValues){
