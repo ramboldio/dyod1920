@@ -22,12 +22,13 @@ void Chunk::append(const std::vector<AllTypeVariant>& values) {
   DebugAssert(values.size() == column_count(),
               "Number of given values do not match up with number of segments within the chunk");
 
-  for (uint16_t index = 0; index < values.size(); ++index) {
+  int values_size = values.size();
+  for (int index = 0; index < values_size; ++index) {
     column_segments[index].get()->append(values[index]);
   }
 }
 
-std::shared_ptr<BaseSegment> Chunk::get_segment(ColumnID column_id) const { return column_segments.at(column_id); }
+std::shared_ptr<BaseSegment> Chunk::get_segment(ColumnID column_id) const { return column_segments.at((int)column_id); }
 
 uint16_t Chunk::column_count() const { return column_segments.size(); }
 

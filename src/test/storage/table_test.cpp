@@ -72,9 +72,16 @@ TEST_F(StorageTableTest, GetColumnIdByName) {
 
 TEST_F(StorageTableTest, GetChunkSize) { EXPECT_EQ(t.max_chunk_size(), 2u); }
 
-TEST_F(StorageTableTest, CompressTable) {
-    t.compress_chunk((ChunkID) 1);
-    EXPECT_TRUE(true);
-}
+    TEST_F(StorageTableTest, CompressTable) {
+        int old_size = t.get_chunk((ChunkID) 0).size();
+        t.compress_chunk((ChunkID) 0);
+        int new_size = t.get_chunk((ChunkID) 0).size();
+        EXPECT_EQ(old_size, new_size);
+    }
+
+    TEST_F(StorageTableTest, CompressTableNonExisting) {
+        EXPECT_ANY_THROW(t.compress_chunk((ChunkID) 1));
+    }
+    // TODO make sure that empty chunks are not an issue
 
 }  // namespace opossum

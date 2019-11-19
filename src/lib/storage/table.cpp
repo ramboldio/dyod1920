@@ -31,8 +31,6 @@ namespace opossum {
         }
     };
 
-    //static void compress_segment(std::shared_ptr<BaseSegment> old_segment, std::string& column_type) {
-    //static std::shared_ptr<BaseSegment> compress_segment(std::shared_ptr<BaseSegment> old_segment, std::string& column_type) {
     static std::shared_ptr<BaseSegment> compress_segment(SegmentCompressionTask compression_task) {
         auto pSegment = make_shared_by_data_type<BaseSegment, DictionarySegment>(compression_task.column_type, compression_task.old_segment);
         return pSegment;
@@ -103,17 +101,17 @@ namespace opossum {
 
     const std::string& Table::column_type(ColumnID column_id) const { return col_types[column_id]; }
 
-    Chunk& Table::get_chunk(ChunkID chunk_id) { return _chunks[chunk_id]; }
+    // TODO make this function into one with const !
+    Chunk& Table::get_chunk(ChunkID chunk_id) { return _chunks.at(chunk_id); }
 
-    const Chunk& Table::get_chunk(ChunkID chunk_id) const { return _chunks[chunk_id]; }
+    const Chunk& Table::get_chunk(ChunkID chunk_id) const { return _chunks.at(chunk_id); }
 
     void Table::compress_chunk(ChunkID chunk_id) {
-
         Chunk dict_chunk = Chunk();
         Chunk& old_chunk = get_chunk(chunk_id);
 
         std::vector<std::future<std::shared_ptr<BaseSegment>>> futures;
-        for(ColumnID i = static_cast<ColumnID>(0); i <= old_chunk.column_count(); ++i){
+        for(ColumnID i = static_cast<ColumnID>(0); i < old_chunk.column_count(); ++i){
             const auto old_segment = old_chunk.get_segment(i);
             const auto compression_task = SegmentCompressionTask(old_segment, column_type(i));
 
