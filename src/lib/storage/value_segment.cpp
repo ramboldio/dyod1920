@@ -13,8 +13,6 @@
 
 namespace opossum {
 
-
-
 template <typename T>
 AllTypeVariant ValueSegment<T>::operator[](const ChunkOffset chunk_offset) const {
   PerformanceWarning("operator[] used");
@@ -38,11 +36,11 @@ size_t ValueSegment<T>::estimate_memory_usage() const {
   return sizeof(T) * _value_segment.size();
 }
 
-    template<typename T>
-    const std::vector<T> &ValueSegment<T>::values() const {
-        return _value_segment;
-    }
+template <typename T>
+const std::vector<T>& ValueSegment<T>::values() const {
+  return _value_segment;
+}
 
-    EXPLICITLY_INSTANTIATE_DATA_TYPES(ValueSegment);
+EXPLICITLY_INSTANTIATE_DATA_TYPES(ValueSegment);
 
 }  // namespace opossum

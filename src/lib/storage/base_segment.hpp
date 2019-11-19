@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "all_type_variant.hpp"
 #include "types.hpp"
 

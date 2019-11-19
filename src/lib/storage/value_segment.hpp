@@ -13,12 +13,9 @@ namespace opossum {
 template <typename T>
 class ValueSegment : public BaseSegment {
  public:
+  ValueSegment() { _value_segment = std::vector<T>(); }
 
-    ValueSegment() {
-        _value_segment = std::vector<T>();
-    }
-
-    // return the value at a certain position. If you want to write efficient operators, back off!
+  // return the value at a certain position. If you want to write efficient operators, back off!
   AllTypeVariant operator[](const ChunkOffset chunk_offset) const final;
 
   // add a value to the end
