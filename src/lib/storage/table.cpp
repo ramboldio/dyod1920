@@ -73,6 +73,10 @@ void Table::append(std::vector<AllTypeVariant> values) {
   _chunks.back().append(values);
 }
 
+void Table::create_new_chunk() {
+  // Implementation goes here
+}
+
 uint16_t Table::column_count() const {
   return _chunks.back()
       .column_count();  // I assume here that all chunks have the same count of columns. Last chunk -> most recent data
