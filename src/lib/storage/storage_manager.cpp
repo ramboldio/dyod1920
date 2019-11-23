@@ -30,9 +30,11 @@ void StorageManager::drop_table(const std::string& name) {
 std::shared_ptr<Table> StorageManager::get_table(const std::string& name) const {
   auto it = tables.find(name);
   if (it != tables.end()) {
-    return it->second;
+    // Found table with specfic name in tables vector
+    return it->second; //return shared_ptr of Table
   }
 
+  // Did not find the table with a given name
   throw std::runtime_error(std::string("Cannot find following table: " + name));
 }
 
