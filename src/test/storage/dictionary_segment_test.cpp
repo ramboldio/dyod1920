@@ -1,12 +1,15 @@
 #include <memory>
 #include <string>
 
+#include "../base_test.hpp"
 #include "gtest/gtest.h"
 
-#include "../../lib/resolve_type.hpp"
-#include "../../lib/storage/base_segment.hpp"
-#include "../../lib/storage/dictionary_segment.hpp"
-#include "../../lib/storage/value_segment.hpp"
+#include "resolve_type.hpp"
+#include "storage/base_segment.hpp"
+#include "storage/dictionary_segment.hpp"
+#include "storage/value_segment.hpp"
+
+namespace opossum{
 
 class StorageDictionarySegmentTest : public ::testing::Test {
  protected:
@@ -104,3 +107,5 @@ TEST_F(StorageDictionarySegmentTest, CountUniqueValues) {
 
   EXPECT_EQ(dict_col->unique_values_count(), 6);
 }
+
+}  // namespace opossum
