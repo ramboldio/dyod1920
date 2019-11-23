@@ -15,7 +15,6 @@ protected:
     std::shared_ptr<const Table> _on_execute() override;
 
     const std::string _table_name;
-    std::shared_ptr<const Table> _table;
 };
 }  // namespace opossum
 
