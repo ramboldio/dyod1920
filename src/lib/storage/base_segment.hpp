@@ -28,5 +28,9 @@ class BaseSegment : private Noncopyable {
 
   // returns the calculated memory usage
   virtual size_t estimate_memory_usage() const = 0;
+
+  virtual std::shared_ptr<const PosList> scan(const ScanType scan_type,
+                                                       const AllTypeVariant search_value,
+                                                       const ChunkID chunk_id) const;
 };
 }  // namespace opossum

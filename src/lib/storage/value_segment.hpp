@@ -32,8 +32,15 @@ class ValueSegment : public BaseSegment {
   // returns the calculated memory usage
   size_t estimate_memory_usage() const final;
 
+
+    std::shared_ptr<const PosList> scan(const ScanType scan_type,
+                                                 const AllTypeVariant search_value,
+                                                const ChunkID chunk_id) const override;
+
  protected:
   std::vector<T> _value_segment;
+
+    bool scan_compare(const ScanType scan_type, const T segment_value, const T search_value) const;
 };
 
 }  // namespace opossum
