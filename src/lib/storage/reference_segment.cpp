@@ -1,5 +1,6 @@
 #include <utils/performance_warning.hpp>
 #include "reference_segment.hpp"
+#include "table.hpp"
 
 
 namespace opossum {
@@ -15,12 +16,9 @@ namespace opossum {
         // Get row ID for lookup in reference table from position list
         const auto row = _pos_list->at(chunk_offset);
 
-        auto value = _referenced_table->get_chunk(row.chunk_id)
+        return _referenced_table->get_chunk(row.chunk_id)
                 .get_segment(_referenced_column_id)
                 ->operator[](row.chunk_offset);
-
-        //TODO Use posList to get a specfic value from the segment
-        return value;
     }
 
     size_t ReferenceSegment::size() const {
@@ -37,6 +35,31 @@ namespace opossum {
 
     ColumnID ReferenceSegment::referenced_column_id() const {
         return _referenced_column_id;
+    }
+
+    std::shared_ptr<const PosList>
+    ReferenceSegment::scan(const ScanType scan_type, const AllTypeVariant search_value, const ChunkID chunk_id) const {
+
+        bool in_scope;
+        std::vector<PosList> pos_list_after_scan; //Can we reuse the old pos list  to avoid reallocating values?
+
+        size_t size_of_pos_list = _pos_list->size();
+
+        //Loop though all entries from pos_list and check if they are in scan range
+        for (size_t pos_list_id=0; pos_list_id < size_of_pos_list; ++pos_list_id) {
+
+            RowID row_id = _pos_list->at(pos_list_id);
+
+            AllTypeVariant value = _referenced_table->get_chunk(row_id.chunk_id)
+                .get_segment(_referenced_column_id)
+                ->operator[](row_id.chunk_offset); //TODO Should we use another operator/method to get value here?
+
+            in_scope = scan_compare(scan_type, value, search_value);
+            if (in_scope) {
+                pos_list_after_scan.emplace_back(row_id);
+            }
+        }
+        return std::make_shared<PosList>(pos_list_after_scan);
     }
 
     size_t ReferenceSegment::estimate_memory_usage() const {

@@ -39,8 +39,6 @@ class ValueSegment : public BaseSegment {
 
  protected:
   std::vector<T> _value_segment;
-
-    bool scan_compare(const ScanType scan_type, const T segment_value, const T search_value) const;
 };
 
 }  // namespace opossum
