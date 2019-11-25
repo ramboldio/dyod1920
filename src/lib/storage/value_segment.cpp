@@ -48,7 +48,7 @@ const std::vector<T>& ValueSegment<T>::values() const {
 template<typename T>
 std::shared_ptr<const PosList>
 ValueSegment<T>::scan(const ScanType scan_type, const AllTypeVariant untyped_search_value, const ChunkID chunk_id) const {
-    auto search_value = type_cast<T>(untyped_search_value);
+    T search_value = type_cast<T>(untyped_search_value);
     PosList posList = PosList();
 
     bool in_scope; // Create boolean value before doing the for loop to allocate memory only once.
