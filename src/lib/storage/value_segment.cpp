@@ -65,24 +65,6 @@ ValueSegment<T>::scan(const ScanType scan_type, const AllTypeVariant untyped_sea
     return std::make_shared<PosList>(posList);
 }
 
-template<typename T>
-bool ValueSegment<T>::scan_compare(ScanType scan_type, T segment_value, T search_value) const {
-    switch (scan_type) {
-    case ScanType::OpEquals:
-    return segment_value == search_value;
-    case ScanType::OpNotEquals:
-    return segment_value != search_value;
-    case ScanType::OpLessThan:
-    return segment_value < search_value;
-    case ScanType::OpLessThanEquals:
-    return segment_value <= search_value;
-    case ScanType::OpGreaterThan:
-    return segment_value > search_value;
-    case ScanType::OpGreaterThanEquals:
-    return segment_value >= search_value;
-}
-}
-
     EXPLICITLY_INSTANTIATE_DATA_TYPES(ValueSegment);
 
 }  // namespace opossum
