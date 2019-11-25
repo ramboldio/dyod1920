@@ -31,8 +31,6 @@ class DictionarySegment : public BaseSegment {
    * Creates a Dictionary segment from a given value segment.
    */
   explicit DictionarySegment(const std::shared_ptr<BaseSegment>& base_segment) {
-    _attribute_vector = std::make_shared<FixedSizeAttributeVector<uint16_t>>(FixedSizeAttributeVector<uint16_t>());
-
     std::set<T> set_dict = std::set<T>();
 
     const auto value_segment = std::dynamic_pointer_cast<ValueSegment<T>>(base_segment);
@@ -107,7 +105,7 @@ class DictionarySegment : public BaseSegment {
     return static_cast<ValueID>(x);
   }
 
-  //  // same as lower_bound(T), but accepts an AllTypeVariant
+  // same as lower_bound(T), but accepts an AllTypeVariant
   ValueID lower_bound(const AllTypeVariant& value) const { return lower_bound(type_cast<T>(value)); }
 
   // returns the first value ID that refers to a value < the search value
@@ -124,6 +122,17 @@ class DictionarySegment : public BaseSegment {
   // same as upper_bound(T), but accepts an AllTypeVariant
   ValueID upper_bound(const AllTypeVariant& value) const { return upper_bound(type_cast<T>(value)); }
 
+  // Find value and return the exact position in dictionary
+  ValueID find_in_dict(T value) const {
+    auto upper_bound_ref = std::find(_dictionary->cbegin(), _dictionary->cend(), value);
+    if (upper_bound_ref == _dictionary->cend()) {
+      return INVALID_VALUE_ID;
+    }
+    auto x = upper_bound_ref - _dictionary->cbegin();
+    return static_cast<ValueID>(x);
+  }
+  ValueID find_in_dict(const AllTypeVariant& value) const { return find_in_dict(type_cast<T>(value)); }
+
   // return the number of unique_values (dictionary entries)
   size_t unique_values_count() const { return static_cast<size_t>(_dictionary->size()); }
 
@@ -137,9 +146,59 @@ class DictionarySegment : public BaseSegment {
     return memory_usage;
   }
 
- protected:
+  std::shared_ptr<const PosList> scan(const ScanType scan_type,
+                                               const AllTypeVariant search_value,
+                                              const ChunkID chunk_id) const {
+    PosList posList = PosList();
+    posList.reserve(_attribute_vector->size());
+
+    ValueID size = static_cast<ValueID>(_attribute_vector->size());
+
+    if (scan_type == ScanType::OpNotEquals || scan_type == ScanType::OpEquals) {
+      ValueID value = find_in_dict(search_value);
+      if ((value == INVALID_VALUE_ID && scan_type == ScanType::OpNotEquals) ||
+          (value != INVALID_VALUE_ID && scan_type == ScanType::OpNotEquals)) {
+        // empty posList if there is no corresponding dictionary entry and it is an equality predicate
+        return std::make_shared<const PosList>(posList);
+      }
+
+      bool include_equal = scan_type == ScanType::OpNotEquals;
+      for (ValueID i = ValueID(0); i < size; i++) {
+        if ((_attribute_vector->get(i) != value) ^ include_equal) {
+          posList.emplace_back(RowID({chunk_id, ChunkOffset(i)}));
+        }
+      }
+    }
+
+
+    if (scan_type == ScanType::OpLessThan || scan_type == ScanType::OpLessThanEquals) {
+      ValueID upper_bound_val = upper_bound(search_value);
+      bool include_equal = scan_type == ScanType::OpLessThanEquals;
+
+      for (ValueID i = ValueID(0); i < size; i++) {
+        if ((_attribute_vector->get(i) < upper_bound_val) || (include_equal && _attribute_vector->get(i) == upper_bound_val)) {
+          posList.emplace_back(RowID({chunk_id, ChunkOffset(i)}));
+        }
+      }
+    }
+
+    if (scan_type == ScanType::OpGreaterThan || scan_type == ScanType::OpGreaterThanEquals) {
+      ValueID lower_bound_val = lower_bound(search_value);
+      bool include_equal = scan_type == ScanType::OpLessThanEquals;
+
+      for (ValueID i = ValueID(0); i < size; i++) {
+        if ((_attribute_vector->get(i) > lower_bound_val) || (include_equal && _attribute_vector->get(i) == lower_bound_val)) {
+          posList.emplace_back(RowID({chunk_id, ChunkOffset(i)}));
+        }
+      }
+    }
+
+    return std::make_shared<const PosList>(posList);
+  }
+
+protected:
   std::shared_ptr<std::vector<T>> _dictionary;
   std::shared_ptr<BaseAttributeVector> _attribute_vector;
 };
 
-}  // namespace opossum
+};  // namespace opossum
