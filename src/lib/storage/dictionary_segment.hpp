@@ -149,8 +149,12 @@ class DictionarySegment : public BaseSegment {
   void scan(const ScanType scan_type, const AllTypeVariant search_value, const ChunkID chunk_id, std::shared_ptr<PosList> pos_list) const override {
     ValueID size = static_cast<ValueID>(_attribute_vector->size());
 
-    if (scan_type == ScanType::OpNotEquals || scan_type == ScanType::OpEquals) {
-      ValueID value = find_in_dict(search_value);
+    T typed_search_value = type_cast<T>(search_value);
+
+      ValueID value = find_in_dict(typed_search_value);
+
+
+      if (scan_type == ScanType::OpNotEquals || scan_type == ScanType::OpEquals) {
 
       // TODO return early eg. if dictornary lookup has no result and is tested for equality
       bool is_equal = scan_type == ScanType::OpEquals;
@@ -163,8 +167,8 @@ class DictionarySegment : public BaseSegment {
 
 
     if (scan_type == ScanType::OpLessThan || scan_type == ScanType::OpLessThanEquals) {
-      ValueID lower_bound_val = lower_bound(search_value);
-      bool include_equal = scan_type == ScanType::OpLessThanEquals;
+      ValueID lower_bound_val = lower_bound(typed_search_value);
+      bool include_equal = scan_type == ScanType::OpLessThanEquals || value != lower_bound_val;
 
       for (ValueID i = ValueID(0); i < size; i++) {
         if ((_attribute_vector->get(i) < lower_bound_val) || (include_equal && _attribute_vector->get(i) == lower_bound_val)) {
@@ -174,8 +178,8 @@ class DictionarySegment : public BaseSegment {
     }
 
     if (scan_type == ScanType::OpGreaterThan || scan_type == ScanType::OpGreaterThanEquals) {
-      ValueID lower_bound_val = lower_bound(search_value);
-      bool include_equal = scan_type == ScanType::OpGreaterThanEquals;
+      ValueID lower_bound_val = lower_bound(typed_search_value);
+      bool include_equal = scan_type == ScanType::OpGreaterThanEquals || value != lower_bound_val;
 
       for (ValueID i = ValueID(0); i < size; i++) {
         if ((_attribute_vector->get(i) > lower_bound_val) || (include_equal && _attribute_vector->get(i) == lower_bound_val)) {
