@@ -41,7 +41,7 @@ namespace opossum {
     ReferenceSegment::scan(const ScanType scan_type, const AllTypeVariant search_value, const ChunkID chunk_id) const {
 
         bool in_scope;
-        std::vector<PosList> pos_list_after_scan; //Can we reuse the old pos list  to avoid reallocating values?
+        PosList pos_list_after_scan = PosList(); //Can we reuse the old pos list  to avoid reallocating values?
 
         size_t size_of_pos_list = _pos_list->size();
 

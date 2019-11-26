@@ -31,7 +31,7 @@ class BaseSegment : private Noncopyable {
 
   virtual std::shared_ptr<const PosList> scan(const ScanType scan_type,
                                                        const AllTypeVariant search_value,
-                                                       const ChunkID chunk_id) const;
+                                                       const ChunkID chunk_id) const = 0;
 
     template<typename T>
     bool scan_compare(ScanType scan_type, T segment_value, T search_value) const {
