@@ -17,6 +17,7 @@
 #include "storage/storage_manager.hpp"
 #include "storage/table.hpp"
 #include "types.hpp"
+#include "storage/chunk.hpp"
 
 namespace opossum {
 
@@ -91,6 +92,47 @@ namespace opossum {
 
    EXPECT_EQ(reference_segment[0], column_1[2]);
    EXPECT_EQ(reference_segment[2], column_2[1]);
+ }
+
+ TEST_F(ReferenceSegmentTest, ReferenceSegmentScan) {
+    // values from 0 - 99
+
+    auto table = std::make_shared<Table>(Table(20));
+    table->add_column("a", "int");
+    table->add_column("b", "string");
+
+    //90 values
+    for (int i = 0; i < 90; i++){
+        table->append({i, "hello_test_" + std::to_string(i)});
+    }
+    DebugAssert(table->chunk_count() == 5, "Table chunk count is not correct");
+
+    const auto chunk_id = ChunkID(4);
+    const auto column_id = ColumnID(0);
+    auto last_segment = table->get_chunk(chunk_id).get_segment(column_id);
+    DebugAssert(last_segment->size() == 10, "Last chunk does not have 10 entries");
+
+
+    //Do scan on last segment
+    //Segment has int values from 80 - 89
+    auto ref_pos_list = std::make_shared<PosList>(PosList());
+    last_segment->scan(ScanType::OpGreaterThan, 83, chunk_id, ref_pos_list);
+
+    DebugAssert(ref_pos_list->size() == 6, "Pos_list does not have 6 entries");
+
+    //Create ReferenceSegment
+
+    auto reference_segment = ReferenceSegment(table, column_id, ref_pos_list);
+
+    //Scan
+    auto pos_list = std::make_shared<PosList>(PosList());
+    reference_segment.scan(ScanType::OpEquals, 87, chunk_id, pos_list);
+
+    EXPECT_EQ(pos_list->size(), 1);
+
+    auto check_value = reference_segment[pos_list->at(0).chunk_offset];
+
+    EXPECT_EQ(type_cast<int>(check_value), 87);
  }
 
 }  // namespace opossum
