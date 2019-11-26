@@ -151,15 +151,11 @@ class DictionarySegment : public BaseSegment {
 
     if (scan_type == ScanType::OpNotEquals || scan_type == ScanType::OpEquals) {
       ValueID value = find_in_dict(search_value);
-      if ((value == INVALID_VALUE_ID && scan_type == ScanType::OpNotEquals) ||
-          (value != INVALID_VALUE_ID && scan_type == ScanType::OpNotEquals)) {
-        // empty posList if there is no corresponding dictionary entry and it is an equality predicate
-        return;
-      }
 
-      bool include_equal = scan_type == ScanType::OpNotEquals;
+      // TODO return early eg. if dictornary lookup has no result and is tested for equality
+      bool is_equal = scan_type == ScanType::OpEquals;
       for (ValueID i = ValueID(0); i < size; i++) {
-        if ((_attribute_vector->get(i) != value) ^ include_equal) {
+        if ((!is_equal && _attribute_vector->get(i) != value) || (is_equal && _attribute_vector->get(i) == value)) {
           pos_list->emplace_back(RowID({chunk_id, ChunkOffset(i)}));
         }
       }
@@ -171,7 +167,7 @@ class DictionarySegment : public BaseSegment {
       bool include_equal = scan_type == ScanType::OpLessThanEquals;
 
       for (ValueID i = ValueID(0); i < size; i++) {
-        if ((_attribute_vector->get(i) < upper_bound_val) || (include_equal && _attribute_vector->get(i) == upper_bound_val)) {
+        if ((_attribute_vector->get(i) < upper_bound_val -1) || (include_equal && _attribute_vector->get(i) == upper_bound_val -1)) {
           pos_list->emplace_back(RowID({chunk_id, ChunkOffset(i)}));
         }
       }
@@ -179,7 +175,7 @@ class DictionarySegment : public BaseSegment {
 
     if (scan_type == ScanType::OpGreaterThan || scan_type == ScanType::OpGreaterThanEquals) {
       ValueID lower_bound_val = lower_bound(search_value);
-      bool include_equal = scan_type == ScanType::OpLessThanEquals;
+      bool include_equal = scan_type == ScanType::OpGreaterThanEquals;
 
       for (ValueID i = ValueID(0); i < size; i++) {
         if ((_attribute_vector->get(i) > lower_bound_val) || (include_equal && _attribute_vector->get(i) == lower_bound_val)) {
