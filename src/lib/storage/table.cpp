@@ -135,6 +135,7 @@ void Table::compress_chunk(ChunkID chunk_id) {
 }
 
     void Table::emplace_chunk(Chunk chunk) {
+      assert(chunk.column_count() == column_count());
       _chunks.emplace_back(std::move(chunk));
     }
 
