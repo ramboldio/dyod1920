@@ -53,7 +53,10 @@ namespace opossum {
 
             in_scope = scan_compare(scan_type, value, search_value);
             if (in_scope) {
-                pos_list->emplace_back(row_id);
+                pos_list->emplace_back(RowID{
+                    ChunkID(0),
+                    ChunkOffset(pos_list_id)
+                });
             }
         }
     }
