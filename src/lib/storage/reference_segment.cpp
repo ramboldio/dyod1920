@@ -1,4 +1,5 @@
 #include <utils/performance_warning.hpp>
+#include <resolve_type.hpp>
 #include "reference_segment.hpp"
 #include "table.hpp"
 
@@ -37,6 +38,7 @@ namespace opossum {
         bool in_scope;
 
         size_t size_of_pos_list = _pos_list->size();
+        const std::string& data_type = _referenced_table->column_type(_referenced_column_id);
 
         //Loop though all entries from pos_list and check if they are in scan range
         for (size_t pos_list_id=0; pos_list_id < size_of_pos_list; ++pos_list_id) {
@@ -44,14 +46,17 @@ namespace opossum {
             RowID row_id = _pos_list->at(pos_list_id);
 
             AllTypeVariant value = _referenced_table->get_value(row_id, _referenced_column_id); //TODO Should we use another operator/method to get value here?
-            
-            in_scope = scan_compare(scan_type, value, search_value);
-            if (in_scope) {
-                pos_list->emplace_back(RowID{
-                    ChunkID(0),
-                    ChunkOffset(pos_list_id)
-                });
-            }
+
+            resolve_data_type(data_type, [&] (auto type) {
+                using Type = typename decltype(type)::type;
+                in_scope = scan_compare(scan_type, type_cast<Type>(value), type_cast<Type>(search_value));
+                if (in_scope) {
+                    pos_list->emplace_back(RowID{
+                            ChunkID(0),
+                            ChunkOffset(pos_list_id)
+                    });
+                }
+            });
         }
     }
 
