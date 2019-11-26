@@ -136,6 +136,10 @@ void Table::compress_chunk(ChunkID chunk_id) {
 
     void Table::emplace_chunk(Chunk chunk) {
       assert(chunk.column_count() == column_count());
+      // When there are no elements in the Table the initially empty chunks are deleted in favor of the new one
+      if (_chunks.at(chunk_count() -1).size() <= 0) {
+        _chunks.erase(_chunks.end() -1);
+      }
       _chunks.emplace_back(std::move(chunk));
     }
 

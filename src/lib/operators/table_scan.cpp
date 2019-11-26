@@ -52,10 +52,11 @@ namespace opossum {
         // create chunk in output table that only holds ReferenceSegments
         // only if there are remaining values
         if (!pos_list->empty()) {
+          Chunk c = Chunk();
           for (ColumnID i = ColumnID(0); i < column_count; i++){
-            // TODO check out if constructing ReferenceSegments on a Table of ReferenceSegments
-            view_table.get_chunk(ChunkID(0)).add_segment(std::make_shared<ReferenceSegment>(input_table, i, pos_list));
+            c.add_segment(std::make_shared<ReferenceSegment>(input_table, i, pos_list));
           }
+          view_table.emplace_chunk(std::move(c));
         }
 
         return std::make_shared<const Table>(std::move(view_table));
