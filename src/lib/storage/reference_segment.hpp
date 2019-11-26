@@ -41,12 +41,12 @@ class ReferenceSegment : public BaseSegment {
   size_t estimate_memory_usage() const override;
 
   void scan(const ScanType scan_type, const AllTypeVariant search_value, const ChunkID chunk_id,
-          std::shared_ptr<PosList> pos_list) const override;
+            std::shared_ptr<PosList> pos_list) const override;
 
-protected:
-    const std::shared_ptr<const PosList> _pos_list;
-    const std::shared_ptr<const Table> _referenced_table;
-    const ColumnID _referenced_column_id;
+ protected:
+  const std::shared_ptr<const PosList> _pos_list;
+  const std::shared_ptr<const Table> _referenced_table;
+  const ColumnID _referenced_column_id;
 };
 
 }  // namespace opossum

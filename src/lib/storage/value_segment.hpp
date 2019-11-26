@@ -32,9 +32,8 @@ class ValueSegment : public BaseSegment {
   // returns the calculated memory usage
   size_t estimate_memory_usage() const final;
 
-
   void scan(const ScanType scan_type, const AllTypeVariant search_value, const ChunkID chunk_id,
-          std::shared_ptr<PosList> pos_list) const override;
+            std::shared_ptr<PosList> pos_list) const override;
 
  protected:
   std::vector<T> _value_segment;

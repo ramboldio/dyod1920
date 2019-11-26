@@ -11,8 +11,8 @@
 #include "all_type_variant.hpp"
 #include "base_attribute_vector.hpp"
 #include "fixed_size_attribute_vector.hpp"
-#include "value_segment.hpp"
 #include "types.hpp"
+#include "value_segment.hpp"
 
 namespace opossum {
 
@@ -146,16 +146,15 @@ class DictionarySegment : public BaseSegment {
     return memory_usage;
   }
 
-  void scan(const ScanType scan_type, const AllTypeVariant search_value, const ChunkID chunk_id, std::shared_ptr<PosList> pos_list) const override {
+  void scan(const ScanType scan_type, const AllTypeVariant search_value, const ChunkID chunk_id,
+            std::shared_ptr<PosList> pos_list) const override {
     ValueID size = static_cast<ValueID>(_attribute_vector->size());
 
     T typed_search_value = type_cast<T>(search_value);
 
-      ValueID value = find_in_dict(typed_search_value);
+    ValueID value = find_in_dict(typed_search_value);
 
-
-      if (scan_type == ScanType::OpNotEquals || scan_type == ScanType::OpEquals) {
-
+    if (scan_type == ScanType::OpNotEquals || scan_type == ScanType::OpEquals) {
       // TODO return early eg. if dictornary lookup has no result and is tested for equality
       bool is_equal = scan_type == ScanType::OpEquals;
       for (ValueID i = ValueID(0); i < size; i++) {
@@ -165,13 +164,13 @@ class DictionarySegment : public BaseSegment {
       }
     }
 
-
     if (scan_type == ScanType::OpLessThan || scan_type == ScanType::OpLessThanEquals) {
       ValueID lower_bound_val = lower_bound(typed_search_value);
       bool include_equal = scan_type == ScanType::OpLessThanEquals || value != lower_bound_val;
 
       for (ValueID i = ValueID(0); i < size; i++) {
-        if ((_attribute_vector->get(i) < lower_bound_val) || (include_equal && _attribute_vector->get(i) == lower_bound_val)) {
+        if ((_attribute_vector->get(i) < lower_bound_val) ||
+            (include_equal && _attribute_vector->get(i) == lower_bound_val)) {
           pos_list->emplace_back(RowID({chunk_id, ChunkOffset(i)}));
         }
       }
@@ -182,14 +181,15 @@ class DictionarySegment : public BaseSegment {
       bool include_equal = scan_type == ScanType::OpGreaterThanEquals || value != lower_bound_val;
 
       for (ValueID i = ValueID(0); i < size; i++) {
-        if ((_attribute_vector->get(i) > lower_bound_val) || (include_equal && _attribute_vector->get(i) == lower_bound_val)) {
+        if ((_attribute_vector->get(i) > lower_bound_val) ||
+            (include_equal && _attribute_vector->get(i) == lower_bound_val)) {
           pos_list->emplace_back(RowID({chunk_id, ChunkOffset(i)}));
         }
       }
     }
   }
 
-protected:
+ protected:
   std::shared_ptr<std::vector<T>> _dictionary;
   std::shared_ptr<BaseAttributeVector> _attribute_vector;
 };

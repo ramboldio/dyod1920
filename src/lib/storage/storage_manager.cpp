@@ -31,7 +31,7 @@ std::shared_ptr<Table> StorageManager::get_table(const std::string& name) const 
   auto it = tables.find(name);
   if (it != tables.end()) {
     // Found table with specfic name in tables vector
-    return it->second; //return shared_ptr of Table
+    return it->second;  //return shared_ptr of Table
   }
 
   // Did not find the table with a given name

@@ -130,21 +130,21 @@ void Table::compress_chunk(ChunkID chunk_id) {
     dict_chunk.add_segment(future.get());
   }
 
-    // Replace Chunk
-    _chunks[chunk_id] = std::move(dict_chunk);
+  // Replace Chunk
+  _chunks[chunk_id] = std::move(dict_chunk);
 }
 
-    void Table::emplace_chunk(Chunk chunk) {
-      assert(chunk.column_count() == column_count());
-      // When there are no elements in the Table the initially empty chunks are deleted in favor of the new one
-      if (_chunks.at(chunk_count() -1).size() <= 0) {
-        _chunks.erase(_chunks.end() -1);
-      }
-      _chunks.emplace_back(std::move(chunk));
-    }
+void Table::emplace_chunk(Chunk chunk) {
+  assert(chunk.column_count() == column_count());
+  // When there are no elements in the Table the initially empty chunks are deleted in favor of the new one
+  if (_chunks.at(chunk_count() - 1).size() <= 0) {
+    _chunks.erase(_chunks.end() - 1);
+  }
+  _chunks.emplace_back(std::move(chunk));
+}
 
-    AllTypeVariant Table::get_value(RowID row_id, ColumnID column_id) const {
-        return _chunks.at(row_id.chunk_id).get_segment(column_id)->operator[](row_id.chunk_offset);
-    }
+AllTypeVariant Table::get_value(RowID row_id, ColumnID column_id) const {
+  return _chunks.at(row_id.chunk_id).get_segment(column_id)->operator[](row_id.chunk_offset);
+}
 
 }  // namespace opossum

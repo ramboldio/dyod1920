@@ -57,37 +57,36 @@ TEST_F(StorageValueSegmentTest, MemoryUsage) {
 }
 
 TEST_F(StorageValueSegmentTest, ScanValueSegmentOrdered) {
+  // values from 0 - 99
+  for (int i = 0; i <= 99; i++) {
+    scan_value_segment.append(i);
+  }
 
-    // values from 0 - 99
-    for (int i = 0; i <= 99; i++){
-        scan_value_segment.append(i);
-    }
+  auto pos_list = std::make_shared<PosList>(PosList());
 
-    auto pos_list = std::make_shared<PosList>(PosList());
+  scan_value_segment.scan(ScanType::OpEquals, 95, ChunkID(0), pos_list);
+  EXPECT_EQ(pos_list->size(), 1);
+  pos_list->clear();
 
-    scan_value_segment.scan(ScanType::OpEquals, 95, ChunkID(0), pos_list);
-    EXPECT_EQ(pos_list->size(), 1);
-    pos_list->clear();
+  scan_value_segment.scan(ScanType::OpGreaterThan, 95, ChunkID(0), pos_list);
+  EXPECT_EQ(pos_list->size(), 4);
+  pos_list->clear();
 
-    scan_value_segment.scan(ScanType::OpGreaterThan, 95, ChunkID(0), pos_list);
-    EXPECT_EQ(pos_list->size(), 4);
-    pos_list->clear();
+  scan_value_segment.scan(ScanType::OpGreaterThanEquals, 90, ChunkID(0), pos_list);
+  EXPECT_EQ(pos_list->size(), 10);
+  pos_list->clear();
 
-    scan_value_segment.scan(ScanType::OpGreaterThanEquals, 90, ChunkID(0), pos_list);
-    EXPECT_EQ(pos_list->size(), 10);
-    pos_list->clear();
+  scan_value_segment.scan(ScanType::OpLessThan, 30, ChunkID(0), pos_list);
+  EXPECT_EQ(pos_list->size(), 30);
+  pos_list->clear();
 
-    scan_value_segment.scan(ScanType::OpLessThan, 30, ChunkID(0), pos_list);
-    EXPECT_EQ(pos_list->size(), 30);
-    pos_list->clear();
+  scan_value_segment.scan(ScanType::OpLessThanEquals, 10, ChunkID(0), pos_list);
+  EXPECT_EQ(pos_list->size(), 11);
+  pos_list->clear();
 
-    scan_value_segment.scan(ScanType::OpLessThanEquals, 10, ChunkID(0), pos_list);
-    EXPECT_EQ(pos_list->size(), 11);
-    pos_list->clear();
-
-    scan_value_segment.scan(ScanType::OpNotEquals, 80, ChunkID(0), pos_list);
-    EXPECT_EQ(pos_list->size(), 99);
-    pos_list->clear();
+  scan_value_segment.scan(ScanType::OpNotEquals, 80, ChunkID(0), pos_list);
+  EXPECT_EQ(pos_list->size(), 99);
+  pos_list->clear();
 }
 
 }  // namespace opossum

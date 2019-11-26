@@ -9,7 +9,7 @@
 #include "storage/dictionary_segment.hpp"
 #include "storage/value_segment.hpp"
 
-namespace opossum{
+namespace opossum {
 
 class StorageDictionarySegmentTest : public ::testing::Test {
  protected:
@@ -108,42 +108,40 @@ TEST_F(StorageDictionarySegmentTest, CountUniqueValues) {
   EXPECT_EQ(dict_col->unique_values_count(), 6);
 }
 
-
 TEST_F(StorageDictionarySegmentTest, ScanValueSegmentOrdered) {
-
-    // values from 0 - 99
-    for (int i = 0; i <= 99; i++){
-        vc_int->append(i);
-    }
+  // values from 0 - 99
+  for (int i = 0; i <= 99; i++) {
+    vc_int->append(i);
+  }
 
   auto col = opossum::make_shared_by_data_type<opossum::BaseSegment, opossum::DictionarySegment>("int", vc_int);
   auto dict_col = std::dynamic_pointer_cast<opossum::DictionarySegment<int>>(col);
 
-    auto pos_list = std::make_shared<PosList>(PosList());
+  auto pos_list = std::make_shared<PosList>(PosList());
 
-    dict_col->scan(ScanType::OpEquals, 95, ChunkID(0), pos_list);
-    EXPECT_EQ(pos_list->size(), 1);
-    pos_list->clear();
+  dict_col->scan(ScanType::OpEquals, 95, ChunkID(0), pos_list);
+  EXPECT_EQ(pos_list->size(), 1);
+  pos_list->clear();
 
-    dict_col->scan(ScanType::OpGreaterThan, 95, ChunkID(0), pos_list);
-    EXPECT_EQ(pos_list->size(), 4);
-    pos_list->clear();
+  dict_col->scan(ScanType::OpGreaterThan, 95, ChunkID(0), pos_list);
+  EXPECT_EQ(pos_list->size(), 4);
+  pos_list->clear();
 
-    dict_col->scan(ScanType::OpGreaterThanEquals, 90, ChunkID(0), pos_list);
-    EXPECT_EQ(pos_list->size(), 10);
-    pos_list->clear();
+  dict_col->scan(ScanType::OpGreaterThanEquals, 90, ChunkID(0), pos_list);
+  EXPECT_EQ(pos_list->size(), 10);
+  pos_list->clear();
 
-    dict_col->scan(ScanType::OpLessThan, 30, ChunkID(0), pos_list);
-    EXPECT_EQ(pos_list->size(), 30);
-    pos_list->clear();
+  dict_col->scan(ScanType::OpLessThan, 30, ChunkID(0), pos_list);
+  EXPECT_EQ(pos_list->size(), 30);
+  pos_list->clear();
 
-    dict_col->scan(ScanType::OpLessThanEquals, 10, ChunkID(0), pos_list);
-    EXPECT_EQ(pos_list->size(), 11);
-    pos_list->clear();
+  dict_col->scan(ScanType::OpLessThanEquals, 10, ChunkID(0), pos_list);
+  EXPECT_EQ(pos_list->size(), 11);
+  pos_list->clear();
 
-    dict_col->scan(ScanType::OpNotEquals, 80, ChunkID(0), pos_list);
-    EXPECT_EQ(pos_list->size(), 99);
-    pos_list->clear();
+  dict_col->scan(ScanType::OpNotEquals, 80, ChunkID(0), pos_list);
+  EXPECT_EQ(pos_list->size(), 99);
+  pos_list->clear();
 }
 
 }  // namespace opossum
