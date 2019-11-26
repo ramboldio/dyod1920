@@ -14,8 +14,7 @@ namespace opossum {
 
     //Constructor
     TableScan::TableScan(const std::shared_ptr<const AbstractOperator> in, ColumnID column_id, const ScanType scan_type,
-                         const AllTypeVariant search_value):
-                         _input_operator(in),
+                         const AllTypeVariant search_value): AbstractOperator(in, nullptr),
                          _column_id(column_id),
                          _scan_type(scan_type),
                          _search_value(search_value) {
@@ -31,7 +30,7 @@ namespace opossum {
     std::shared_ptr<const Table> TableScan::_on_execute() {
 
         //extract Table from previous operator
-        std::shared_ptr<const Table> input_table = _input_operator->get_output();
+        std::shared_ptr<const Table> input_table = _input_table_left();
 
         // TODO move to Table class
         Table view_table = Table();
