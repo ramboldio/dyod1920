@@ -12,10 +12,7 @@
 
 namespace opossum {
 
-class BaseTableScanImpl;
 class Table;
-
-class DictonarySegment;
 
 class TableScan : public AbstractOperator {
  public:
