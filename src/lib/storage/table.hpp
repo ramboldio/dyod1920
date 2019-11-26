@@ -79,6 +79,9 @@ class Table : private Noncopyable {
   // compresses a ValueSegment into a DictionarySegment
   void compress_chunk(ChunkID chunk_id);
 
+  //Get all value by RowID
+  AllTypeVariant get_value(RowID row_id, ColumnID column_id) const;
+
  protected:
   uint32_t chunk_size;
   std::vector<Chunk> _chunks;

@@ -139,4 +139,8 @@ void Table::compress_chunk(ChunkID chunk_id) {
       _chunks.emplace_back(std::move(chunk));
     }
 
+    AllTypeVariant Table::get_value(RowID row_id, ColumnID column_id) const {
+        return _chunks.at(row_id.chunk_id).get_segment(column_id)->operator[](row_id.chunk_offset);
+    }
+
 }  // namespace opossum
