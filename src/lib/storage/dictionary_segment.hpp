@@ -148,7 +148,7 @@ class DictionarySegment : public BaseSegment {
 
   std::shared_ptr<const PosList> scan(const ScanType scan_type,
                                                const AllTypeVariant search_value,
-                                              const ChunkID chunk_id) const {
+                                              const ChunkID chunk_id) const override {
     PosList posList = PosList();
     posList.reserve(_attribute_vector->size());
 

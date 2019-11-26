@@ -45,13 +45,12 @@ namespace opossum {
 
             //Create new table and new
             if (pos_list->size() > 0){
-                ReferenceSegment reference_segment = ReferenceSegment(input_table,_column_id, pos_list);
-
+                auto ref_ptr = std::make_shared<ReferenceSegment>(ReferenceSegment(input_table,_column_id, pos_list));
                 //Add all reference segments to the first Chunk
-                view_table.get_chunk(ChunkID(0)).add_segment(std::make_shared<ReferenceSegment>(reference_segment));
+                view_table.get_chunk(ChunkID(0)).add_segment(ref_ptr);
             }
         }
-        return std::make_shared<const Table> (view_table);
+        return std::make_shared<const Table>(std::move(view_table));
     }
 
     //Getter
