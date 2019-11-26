@@ -14,11 +14,7 @@ namespace opossum {
         PerformanceWarning("operator[] used");
 
         // Get row ID for lookup in reference table from position list
-        const auto row = _pos_list->at(chunk_offset);
-
-        return _referenced_table->get_chunk(row.chunk_id)
-                .get_segment(_referenced_column_id)
-                ->operator[](row.chunk_offset);
+        return _referenced_table->get_value(_pos_list->at(chunk_offset), _referenced_column_id);
     }
 
     size_t ReferenceSegment::size() const {
@@ -47,10 +43,8 @@ namespace opossum {
 
             RowID row_id = _pos_list->at(pos_list_id);
 
-            AllTypeVariant value = _referenced_table->get_chunk(row_id.chunk_id)
-                .get_segment(_referenced_column_id)
-                ->operator[](row_id.chunk_offset); //TODO Should we use another operator/method to get value here?
-
+            AllTypeVariant value = _referenced_table->get_value(row_id, _referenced_column_id); //TODO Should we use another operator/method to get value here?
+            
             in_scope = scan_compare(scan_type, value, search_value);
             if (in_scope) {
                 pos_list->emplace_back(RowID{

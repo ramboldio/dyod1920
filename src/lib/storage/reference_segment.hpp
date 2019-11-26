@@ -14,9 +14,12 @@
 #include "utils/assert.hpp"
 #include "value_segment.hpp"
 
+#include "type_cast.hpp"
+
 namespace opossum {
 
 // ReferenceSegment is a specific segment type that stores all its values as position list of a referenced segment
+
 class ReferenceSegment : public BaseSegment {
  public:
   // creates a reference segment
