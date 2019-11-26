@@ -111,11 +111,11 @@ class DictionarySegment : public BaseSegment {
   // returns the first value ID that refers to a value < the search value
   // returns INVALID_VALUE_ID if all values are smaller than or equal to the search value
   ValueID upper_bound(T value) const {
-    auto upper_bound_ref = std::upper_bound(_dictionary->cbegin(), _dictionary->cend(), value);
-    if (upper_bound_ref == _dictionary->cend()) {
+    auto upper_bound_ref = std::upper_bound(_dictionary->begin(), _dictionary->end(), value);
+    if (upper_bound_ref == _dictionary->end()) {
       return INVALID_VALUE_ID;
     }
-    auto x = upper_bound_ref - _dictionary->cbegin();
+    auto x = upper_bound_ref - _dictionary->begin();
     return static_cast<ValueID>(x);
   }
 
@@ -124,11 +124,11 @@ class DictionarySegment : public BaseSegment {
 
   // Find value and return the exact position in dictionary
   ValueID find_in_dict(T value) const {
-    auto upper_bound_ref = std::find(_dictionary->cbegin(), _dictionary->cend(), value);
-    if (upper_bound_ref == _dictionary->cend()) {
+    auto upper_bound_ref = std::find(_dictionary->begin(), _dictionary->end(), value);
+    if (upper_bound_ref == _dictionary->end()) {
       return INVALID_VALUE_ID;
     }
-    auto x = upper_bound_ref - _dictionary->cbegin();
+    auto x = upper_bound_ref - _dictionary->begin();
     return static_cast<ValueID>(x);
   }
   ValueID find_in_dict(const AllTypeVariant& value) const { return find_in_dict(type_cast<T>(value)); }
@@ -163,11 +163,11 @@ class DictionarySegment : public BaseSegment {
 
 
     if (scan_type == ScanType::OpLessThan || scan_type == ScanType::OpLessThanEquals) {
-      ValueID upper_bound_val = upper_bound(search_value);
+      ValueID lower_bound_val = lower_bound(search_value);
       bool include_equal = scan_type == ScanType::OpLessThanEquals;
 
       for (ValueID i = ValueID(0); i < size; i++) {
-        if ((_attribute_vector->get(i) < upper_bound_val -1) || (include_equal && _attribute_vector->get(i) == upper_bound_val -1)) {
+        if ((_attribute_vector->get(i) < lower_bound_val) || (include_equal && _attribute_vector->get(i) == lower_bound_val)) {
           pos_list->emplace_back(RowID({chunk_id, ChunkOffset(i)}));
         }
       }
