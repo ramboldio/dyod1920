@@ -20,6 +20,10 @@
 
 namespace opossum {
 
+void Table::add_column_definition(const std::string& name, const std::string& type) {
+  // Implementation goes here
+}
+
 struct SegmentCompressionTask {
   std::shared_ptr<BaseSegment> old_segment;
   std::string column_type;
@@ -71,6 +75,10 @@ void Table::append(std::vector<AllTypeVariant> values) {
     this->build_chunk();
   }
   _chunks.back().append(values);
+}
+
+void Table::create_new_chunk() {
+  // Implementation goes here
 }
 
 uint16_t Table::column_count() const {
@@ -125,4 +133,18 @@ void Table::compress_chunk(ChunkID chunk_id) {
   // Replace Chunk
   _chunks[chunk_id] = std::move(dict_chunk);
 }
+
+void Table::emplace_chunk(Chunk chunk) {
+  assert(chunk.column_count() == column_count());
+  // When there are no elements in the Table the initially empty chunks are deleted in favor of the new one
+  if (_chunks.at(chunk_count() - 1).size() <= 0) {
+    _chunks.erase(_chunks.end() - 1);
+  }
+  _chunks.emplace_back(std::move(chunk));
+}
+
+AllTypeVariant Table::get_value(RowID row_id, ColumnID column_id) const {
+  return _chunks.at(row_id.chunk_id).get_segment(column_id)->operator[](row_id.chunk_offset);
+}
+
 }  // namespace opossum

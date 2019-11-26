@@ -15,11 +15,10 @@ endif()
 add_definitions("-DSOURCE_PATH_SIZE=${SOURCE_PATH_SIZE}")
 
 # Global flags and include directories
-add_compile_options(-std=c++1z -pthread -Wall -Wextra -Werror -Wno-unused-parameter -Wno-sign-compare)
+add_compile_options(-std=c++1z -pthread -Wall -Wextra -Werror -Wno-unused-parameter)
 
 include_directories(
     ${PROJECT_SOURCE_DIR}/third_party/googletest/googletest/include
-
     ${PROJECT_SOURCE_DIR}/src/lib/
     ${Boost_INCLUDE_DIRS}
 )
