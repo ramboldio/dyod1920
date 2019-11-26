@@ -37,8 +37,8 @@ class ReferenceSegment : public BaseSegment {
 
   size_t estimate_memory_usage() const override;
 
-    std::shared_ptr<const PosList>
-    scan(const ScanType scan_type, const AllTypeVariant search_value, const ChunkID chunk_id) const override;
+  void scan(const ScanType scan_type, const AllTypeVariant search_value, const ChunkID chunk_id,
+          std::shared_ptr<PosList> pos_list) const override;
 
 protected:
     const std::shared_ptr<const PosList> _pos_list;

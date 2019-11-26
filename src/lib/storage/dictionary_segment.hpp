@@ -146,12 +146,7 @@ class DictionarySegment : public BaseSegment {
     return memory_usage;
   }
 
-  std::shared_ptr<const PosList> scan(const ScanType scan_type,
-                                               const AllTypeVariant search_value,
-                                              const ChunkID chunk_id) const override {
-    PosList posList = PosList();
-    posList.reserve(_attribute_vector->size());
-
+  void scan(const ScanType scan_type, const AllTypeVariant search_value, const ChunkID chunk_id, std::shared_ptr<PosList> pos_list) const override {
     ValueID size = static_cast<ValueID>(_attribute_vector->size());
 
     if (scan_type == ScanType::OpNotEquals || scan_type == ScanType::OpEquals) {
@@ -159,13 +154,13 @@ class DictionarySegment : public BaseSegment {
       if ((value == INVALID_VALUE_ID && scan_type == ScanType::OpNotEquals) ||
           (value != INVALID_VALUE_ID && scan_type == ScanType::OpNotEquals)) {
         // empty posList if there is no corresponding dictionary entry and it is an equality predicate
-        return std::make_shared<const PosList>(posList);
+        return;
       }
 
       bool include_equal = scan_type == ScanType::OpNotEquals;
       for (ValueID i = ValueID(0); i < size; i++) {
         if ((_attribute_vector->get(i) != value) ^ include_equal) {
-          posList.emplace_back(RowID({chunk_id, ChunkOffset(i)}));
+          pos_list->emplace_back(RowID({chunk_id, ChunkOffset(i)}));
         }
       }
     }
@@ -177,7 +172,7 @@ class DictionarySegment : public BaseSegment {
 
       for (ValueID i = ValueID(0); i < size; i++) {
         if ((_attribute_vector->get(i) < upper_bound_val) || (include_equal && _attribute_vector->get(i) == upper_bound_val)) {
-          posList.emplace_back(RowID({chunk_id, ChunkOffset(i)}));
+          pos_list->emplace_back(RowID({chunk_id, ChunkOffset(i)}));
         }
       }
     }
@@ -188,12 +183,10 @@ class DictionarySegment : public BaseSegment {
 
       for (ValueID i = ValueID(0); i < size; i++) {
         if ((_attribute_vector->get(i) > lower_bound_val) || (include_equal && _attribute_vector->get(i) == lower_bound_val)) {
-          posList.emplace_back(RowID({chunk_id, ChunkOffset(i)}));
+          pos_list->emplace_back(RowID({chunk_id, ChunkOffset(i)}));
         }
       }
     }
-
-    return std::make_shared<const PosList>(posList);
   }
 
 protected:

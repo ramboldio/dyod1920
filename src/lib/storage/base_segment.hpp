@@ -29,9 +29,7 @@ class BaseSegment : private Noncopyable {
   // returns the calculated memory usage
   virtual size_t estimate_memory_usage() const = 0;
 
-  virtual std::shared_ptr<const PosList> scan(const ScanType scan_type,
-                                                       const AllTypeVariant search_value,
-                                                       const ChunkID chunk_id) const = 0;
+  virtual void scan(const ScanType scan_type, const AllTypeVariant search_value, const ChunkID chunk_id, std::shared_ptr<PosList> pos_list) const = 0;
 
     template<typename T>
     bool scan_compare(ScanType scan_type, T segment_value, T search_value) const {

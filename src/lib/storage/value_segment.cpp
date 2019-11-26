@@ -46,23 +46,20 @@ const std::vector<T>& ValueSegment<T>::values() const {
 //TODO I don't like the chunk_id parameter. But it is needed to construct the pos list
 //Clean but unefficient would be to return a vector<ChunkOffset> and construct the poslist within the chunk
 template<typename T>
-std::shared_ptr<const PosList>
-ValueSegment<T>::scan(const ScanType scan_type, const AllTypeVariant untyped_search_value, const ChunkID chunk_id) const {
+void ValueSegment<T>::scan(const ScanType scan_type, const AllTypeVariant untyped_search_value, const ChunkID chunk_id, std::shared_ptr<PosList> pos_list) const {
     T search_value = type_cast<T>(untyped_search_value);
-    PosList posList = PosList();
 
     bool in_scope; // Create boolean value before doing the for loop to allocate memory only once.
     size_t size_of_value_segment = _value_segment.size();
     for (size_t chunk_offset=0; chunk_offset < size_of_value_segment; ++chunk_offset) {
         in_scope = scan_compare(scan_type, _value_segment.at(chunk_offset), search_value);
         if (in_scope){
-            posList.emplace_back(RowID({
+            pos_list->emplace_back(RowID({
                 chunk_id,
                 ChunkOffset(chunk_offset)}
                 ));
         }
     }
-    return std::make_shared<PosList>(posList);
 }
 
     EXPLICITLY_INSTANTIATE_DATA_TYPES(ValueSegment);

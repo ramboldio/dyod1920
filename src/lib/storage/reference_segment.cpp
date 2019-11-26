@@ -37,11 +37,8 @@ namespace opossum {
         return _referenced_column_id;
     }
 
-    std::shared_ptr<const PosList>
-    ReferenceSegment::scan(const ScanType scan_type, const AllTypeVariant search_value, const ChunkID chunk_id) const {
-
+    void ReferenceSegment::scan(const ScanType scan_type, const AllTypeVariant search_value, const ChunkID chunk_id, std::shared_ptr<PosList> pos_list) const {
         bool in_scope;
-        PosList pos_list_after_scan = PosList(); //Can we reuse the old pos list  to avoid reallocating values?
 
         size_t size_of_pos_list = _pos_list->size();
 
@@ -56,10 +53,9 @@ namespace opossum {
 
             in_scope = scan_compare(scan_type, value, search_value);
             if (in_scope) {
-                pos_list_after_scan.emplace_back(row_id);
+                pos_list->emplace_back(row_id);
             }
         }
-        return std::make_shared<PosList>(pos_list_after_scan);
     }
 
     size_t ReferenceSegment::estimate_memory_usage() const {

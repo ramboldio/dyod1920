@@ -33,23 +33,33 @@ namespace opossum {
         //extract Table from previous operator
         std::shared_ptr<const Table> input_table = _input_operator->get_output();
 
-        //Create new table which is a view on the old one.
+        // TODO move to Table class
         Table view_table = Table();
-        view_table.add_column(input_table->column_name(_column_id), input_table->column_type(_column_id));
-
-        ChunkID chunk_count = input_table->chunk_count();
-        for (ChunkID chunk_id = ChunkID(0); chunk_id < chunk_count; ++chunk_id){
-            std::shared_ptr<const PosList> pos_list = input_table->get_chunk(chunk_id)
-                    .get_segment(_column_id)
-                    ->scan(_scan_type, _search_value, chunk_id);
-
-            //Create new table and new
-            if (pos_list->size() > 0){
-                auto ref_ptr = std::make_shared<ReferenceSegment>(ReferenceSegment(input_table,_column_id, pos_list));
-                //Add all reference segments to the first Chunk
-                view_table.get_chunk(ChunkID(0)).add_segment(ref_ptr);
-            }
+        ColumnID column_count = ColumnID(input_table->column_count());
+        for (ColumnID i = ColumnID(0); i < column_count; i++){
+          view_table.add_column(input_table->column_name(i), input_table->column_type(i));
         }
+
+        // Do scan
+        std::shared_ptr<PosList> pos_list = std::make_shared<PosList>();
+        ChunkID chunk_count = input_table->chunk_count();
+
+        for (ChunkID chunk_id = ChunkID(0); chunk_id < chunk_count; ++chunk_id){
+            input_table->get_chunk(chunk_id).get_segment(_column_id)->scan(_scan_type, _search_value, chunk_id, pos_list);
+        }
+
+        // create chunk in output table that only holds ReferenceSegments
+        // only if there are remaining values
+        if (!pos_list->empty()) {
+          Chunk c = Chunk();
+          for (ColumnID i = ColumnID(0); i < column_count; i++){
+            view_table.add_column(input_table->column_name(i), input_table->column_type(i));
+            // TODO check out if constructing ReferenceSegments on a Table of ReferenceSegments
+            c.add_segment(std::make_shared<ReferenceSegment>(input_table, i, pos_list));
+          }
+          view_table.emplace_chunk(std::move(c));
+        }
+
         return std::make_shared<const Table>(std::move(view_table));
     }
 

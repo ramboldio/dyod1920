@@ -134,8 +134,8 @@ void Table::compress_chunk(ChunkID chunk_id) {
     _chunks[chunk_id] = std::move(dict_chunk);
 }
 
-void emplace_chunk(Chunk chunk) {
-  // Implementation goes here
-}
+    void Table::emplace_chunk(Chunk chunk) {
+      _chunks.emplace_back(std::move(chunk));
+    }
 
 }  // namespace opossum
