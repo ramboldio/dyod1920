@@ -49,6 +49,8 @@ class BaseSegment : private Noncopyable {
             case ScanType::OpGreaterThanEquals:
                 return segment_value >= search_value;
         }
+
+        return segment_value >= search_value;
     }
 };
 }  // namespace opossum
